@@ -13,5 +13,5 @@ Load the database with initial set of values by executing the python script.
 Finally run the web application.
 ### python application.py
 
-Access and test the application by visiting,
-#### http://localhost:5000
+Access and test the application by visiting, 
+### http://localhost:5000
