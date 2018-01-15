@@ -1,0 +1,48 @@
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
+
+<div class="container">
+	<div class="row content border-solid">
+		<div class="col-md-6">
+			<div class=" padding-bottom "></div>
+			{% with messages = get_flashed_messages() %} {% if messages %}
+			<ul>
+				{% for message in messages %}
+				<li class="red"> <strong> {{ message }} </strong> </li>
+				{% endfor %}
+			</ul>
+			{% endif %} {% endwith %}
+
+			<h4 class="h4-title ">Add Item</h4>
+			<div class="padding-bottom "></div>
+			<form action="# " method="POST">
+				<div class="form-group row ">
+					<div class="col-xs-4 ">
+						<label for="name">Item Name:</label>
+						<input type="text" class="form-control" id="name" name="name">
+					</div>
+				</div>
+				<div class="form-group row ">
+					<div class="col-xs-8 ">
+						<label for="description ">Description:</label>
+						<textarea class="form-control " rows="2 " maxlength="250" name="description"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="category">Category:</label>
+					<div>
+						<select name="select">
+														{% for category in categories %}
+															 <option value={{category.id}}>{{category.name}}</option>
+														 {% endfor %}
+					   </select>
+					</div>
+				</div>
+				<div class="padding-bottom"></div>
+				<button type="submit " class="btn-default bold" id="submit">
+														 Submit</button>
+				<div class="padding-bottom "></div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}

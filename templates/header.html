@@ -1,0 +1,38 @@
+<div class="header">
+	<div class="container">
+		<header class="row">
+			<div class="col-md-6">
+				<h2><a href="/catalog" class="itemCatalog">Item Catalog</a></h2>
+			</div>
+			<div class="col-md-6 text-right login-div">
+				{% if session['user_id'] %}
+				<a href="#" class="btn login-btn" onclick="signOutCallback();">Logout</a> {% else %}
+				<a href="/catalog/login" class="btn login-btn">Login</a> {% endif %}
+			</div>
+
+		</header>
+
+
+	</div>
+
+	<script>
+		function signOutCallback() {
+			$.ajax({
+				type: 'GET',
+				url: '/gdisconnect',
+				processData: false,
+				contentType: 'application/octet-stream; charset=utf-8',
+				success: function(result) {
+					// Handle or verify the server response if necessary.
+					if (result) {
+
+						setTimeout(function() {
+							window.location.href = "/catalog";
+						}, 4000);
+					}
+				}
+
+			});
+		}
+	</script>
+</div>

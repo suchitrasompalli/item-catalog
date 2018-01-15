@@ -1,0 +1,23 @@
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
+
+<div class="container">
+	<div class="row content border-solid">
+		<div class="col-md-9">
+			<div class="padding-bottom"></div>
+			<h4 class="h4-title">Delete Item</h4>
+			<div class="padding-bottom"></div>
+			<form action="#" method="post">
+				<div class="form-group row">
+					<div class="col-xs-9">
+						<h3>Are you sure you want to delete ?</h3>
+					</div>
+				</div>
+				<div class="padding-bottom"></div>
+				<button type="submit" class="btn-default bold" id="submit" type="submit">
+														 Submit</button>
+				<div class="padding-bottom"></div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}
