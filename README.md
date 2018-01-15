@@ -4,11 +4,13 @@ categories.
 It also provides a user registration and authentication system.
 
 ## How to launch the program.
-Set up the initial sqllite database.
-    Run python database_setup.py
+Set up the initial SQLite database by executing the python script.
+### python database_setup.py
 
-Load the database with initial set of values.
-    Run python add_catalog_items.py
+Load the database with initial set of values by executing the python script.
+### python add_catalog_items.py
 
-Run the web application.
-    Run python application.py
+Finally run the web application.
+### python application.py
+
+Access and test the application by visiting, ### http://localhost:5000
