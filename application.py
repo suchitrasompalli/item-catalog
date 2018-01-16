@@ -10,6 +10,7 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 from flask import make_response
+from functools import wraps
 import requests
 
 from sqlalchemy import create_engine, desc
@@ -33,34 +34,72 @@ DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
 
-@app.route('/catalog.json')
-def catalogJSON():
-    """Return json showing all the items in each category."""
-    categories = db_session.query(Category).all()
-    catalog_dict = {}
-    catalog_dict['Category'] = categoryJSON(categories)
-    return jsonify(catalog_dict)
-
-
-def categoryJSON(categories):
-    """For each category build the json."""
+def getCategoryJSON(categories):
+    """Helper function builds the json for each of the categories."""
     category_list = []
     for category in categories:
         category_dict = {}
         category_dict['id'] = category.id
         category_dict['name'] = category.name
         items = db_session.query(Item).filter_by(category_id=category.id).all()
-        category_dict['Item'] = itemsJSON(items)
+        category_dict['Item'] = getItemsJSON(items)
         category_list.append(category_dict)
     return category_list
 
 
-def itemsJSON(items):
-    """Build json for each of the items."""
+def getItemsJSON(items):
+    """Helper function that builds json for each of the items."""
     items_list = []
     for i in items:
         items_list.append(i.serialize)
     return items_list
+
+
+@app.route('/catalog.json')
+def catalogJSON():
+    """Return json showing all the items in each category."""
+    categories = db_session.query(Category).all()
+    catalog_dict = {}
+    catalog_dict['Category'] = getCategoryJSON(categories)
+    return jsonify(catalog_dict)
+
+
+@app.route('/catalog/<int:category_id>/item/JSON')
+def categoryItemsJSON(category_id):
+    """Get all items based of a single category."""
+    items = db_session.query(Item).filter_by(
+        category_id=category_id).all()
+    return jsonify(Item=[i.serialize for i in items])
+
+
+@app.route('/catalog/<int:category_id>/item/<int:item_id>/JSON')
+def itemJSON(category_id, item_id):
+    """Get the item description json for given item."""
+    try:
+        item = db_session.query(Item).filter_by(id=item_id,
+                                                category_id=category_id).one()
+        return jsonify(Item=item.serialize)
+    except NoResultFound:
+        return jsonify({})
+
+
+@app.route('/categories/JSON')
+def categoriesJSON():
+    """Get all categories json."""
+    categories = db_session.query(Category).all()
+    return jsonify(categories=[c.serialize for c in categories])
+
+
+@app.route('/catalog/<category_name>/item/JSON')
+def categoryNameItemsJSON(category_name):
+    """Get all items based of a single category identified by name."""
+    try:
+        category = db_session.query(Category).filter_by(
+                                name=category_name).one()
+        items = db_session.query(Item).filter_by(category_id=category.id).all()
+        return jsonify(Item=[i.serialize for i in items])
+    except NoResultFound:
+        return jsonify({})
 
 
 @app.route('/')
@@ -273,12 +312,21 @@ def validForm(name, description):
     return True
 
 
-# Create a new item under a category.
+def login_required(f):
+    """Check if user logged in before further access."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect('/catalog/login')
+        else:
+            return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route('/catalog/addItem/', methods=['GET', 'POST'])
+@login_required
 def addItem():
     """Create a new item under a category."""
-    if 'user_id' not in session:
-        return redirect('/catalog/login')
     if request.method == 'POST':
         if validForm(request.form["name"], request.form["description"]):
             print("finished valid form")
@@ -299,12 +347,10 @@ def addItem():
         return render_template('addItem.html', categories=categories)
 
 
-# Edit a item under a category.
 @app.route('/catalog/<item_name>/edit/', methods=['GET', 'POST'])
+@login_required
 def editItem(item_name):
     """Make changes to existing Item in database."""
-    if 'user_id' not in session:
-        return redirect('/catalog/login')
     item_name = unquote(item_name)
     itemToEdit = db_session.query(Item).filter_by(name=item_name).one()
     if session['user_id'] != itemToEdit.user_id:
@@ -335,10 +381,9 @@ def editItem(item_name):
 
 # Edit a item under a category.
 @app.route('/catalog/<item_name>/delete/', methods=['GET', 'POST'])
+@login_required
 def deleteItem(item_name):
     """Delete a item in database."""
-    if 'user_id' not in session:
-        return redirect('/catalog/login')
     itemToDelete = db_session.query(Item).filter_by(name=item_name).one()
     if session['user_id'] != itemToDelete.user_id:
         return "<script>function myFunction() {alert('You are not authorized \
