@@ -31,14 +31,14 @@ category1 = Category(name="Trees")
 session.add(category1)
 session.commit()
 
-item1 = Item(name="Peach", description="A decidious tree bearing \
-             sweet juicy stone fruit.", category=category1)
+item1 = Item(name="Peach", description="A decidious tree bearing sweet juicy \
+stone fruit.", category=category1)
 
 session.add(item1)
 session.commit()
 
-item2 = Item(name="Pear", description="The pear is any of several \
-             tree and shrubs in the family Rosaceae..", category=category1)
+item2 = Item(name="Pear", description="The pear is any of several tree and \
+shrubs in the family Rosaceae..", category=category1)
 
 session.add(item2)
 session.commit()
@@ -50,7 +50,7 @@ session.add(category1)
 session.commit()
 
 item1 = Item(name="Rosemary", description="A small evergreen shrub with \
-             leaves like pine needles", category=category1)
+leaves like pine needles", category=category1)
 
 session.add(item1)
 session.commit()
